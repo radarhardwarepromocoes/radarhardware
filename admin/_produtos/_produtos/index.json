@@ -1,0 +1,26 @@
+[
+  {
+    "nome": "LG UltraGear 34G600A-B",
+    "categoria": "Monitor",
+    "descricao": "Monitor ultrawide 34\" curvo, 144Hz, 1ms, IPS — experiência imersiva para jogos e produtividade.",
+    "link_shopee": "https://shopee.com.br",
+    "link_ml": "https://mercadolivre.com.br",
+    "link_amazon": "https://amazon.com.br"
+  },
+  {
+    "nome": "Dell Inspiron 15 3530",
+    "categoria": "Notebook",
+    "descricao": "Intel Core i5 13ª geração, 16GB RAM, SSD 512GB — custo-benefício premium.",
+    "link_shopee": "https://shopee.com.br",
+    "link_ml": "https://mercadolivre.com.br",
+    "link_amazon": "https://amazon.com.br"
+  },
+  {
+    "nome": "BluePC FRAG PC Gamer",
+    "categoria": "PC Gamer",
+    "descricao": "PC Gamer completo com placa de vídeo dedicada, processador potente e gabinete com RGB.",
+    "link_shopee": "https://shopee.com.br",
+    "link_ml": "https://mercadolivre.com.br",
+    "link_amazon": "https://amazon.com.br"
+  }
+]
