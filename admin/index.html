@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Radar Hardware</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --neon: #00d4ff; --neon2: #7b2fff; --bg: #050a12; --card: #0d1a2e; --border: rgba(0,212,255,0.2); --text: #e0eaf8; --muted: #6b8aad; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 24px; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+  h1 { font-family: 'Orbitron', monospace; font-size: 22px; background: linear-gradient(135deg,#00d4ff,#7b2fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 20px; color: var(--neon); }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  input, textarea, select { width: 100%; background: #060e1a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 18px; outline: none; transition: border-color .2s; }
+  input:focus, textarea:focus, select:focus { border-color: var(--neon); }
+  textarea { min-height: 80px; resize: vertical; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: filter .2s, transform .15s; }
+  .btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+  .btn-primary { background: linear-gradient(135deg,var(--neon),var(--neon2)); color: #fff; }
+  .btn-danger { background: rgba(255,60,60,0.15); color: #ff6b6b; border: 1px solid rgba(255,60,60,0.3); }
+  .btn-home { background: rgba(0,212,255,0.1); color: var(--neon); border: 1px solid var(--border); text-decoration: none; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--neon); border-radius: 12px; padding: 14px 20px; font-size: 13px; color: var(--neon); z-index: 999; display: none; }
+  .lista-produtos { margin-top: 0; }
+  .produto-item { background: #060e1a; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .produto-item-info { flex: 1; }
+  .produto-item-nome { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .produto-item-cat { font-size: 11px; color: var(--neon); text-transform: uppercase; letter-spacing: 1px; }
+  .produto-item-acoes { display: flex; gap: 8px; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 20px 0; }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="nav">
+    <div>
+      <h1>⚙️ ADMIN</h1>
+      <div class="subtitle">Gerencie os produtos do Radar Hardware</div>
+    </div>
+    <a class="btn btn-home" href="/">← Ver site</a>
+  </div>
+
+  <div class="card">
+    <h2>➕ Adicionar / Editar Produto</h2>
+    <input type="hidden" id="edit-index" value="-1">
+    <label>Nome do produto</label>
+    <input type="text" id="nome" placeholder="Ex: LG UltraGear 34G600A-B">
+    <label>Categoria</label>
+    <select id="categoria">
+      <option value="Monitor">Monitor</option>
+      <option value="Notebook">Notebook</option>
+      <option value="PC Gamer">PC Gamer</option>
+      <option value="Componente">Componente</option>
+      <option value="Periférico">Periférico</option>
+      <option value="Outro">Outro</option>
+    </select>
+    <label>Descrição curta</label>
+    <textarea id="descricao" placeholder="Ex: Monitor ultrawide 34&quot; curvo, 144Hz, 1ms, IPS."></textarea>
+    <label>Link Shopee (afiliado)</label>
+    <input type="url" id="link_shopee" placeholder="https://s.shopee.com.br/...">
+    <label>Link Mercado Livre (afiliado)</label>
+    <input type="url" id="link_ml" placeholder="https://mercadolivre.com/...">
+    <label>Link Amazon (afiliado)</label>
+    <input type="url" id="link_amazon" placeholder="https://amzn.to/...">
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" onclick="salvarProduto()">💾 Salvar Produto</button>
+      <button class="btn btn-danger btn-sm" onclick="limparForm()" style="display:none" id="btn-cancelar">✕ Cancelar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📦 Produtos Cadastrados</h2>
+    <div class="lista-produtos" id="lista"></div>
+  </div>
+
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-primary" onclick="exportarJSON()" style="font-size:13px">📥 Exportar produtos.json</button>
+    <p style="color:var(--muted);font-size:11px;margin-top:10px">Após exportar, faça upload do arquivo no GitHub em <code style="color:var(--neon)">_produtos/index.json</code></p>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Salvo com sucesso!</div>
+
+<script>
+let produtos = JSON.parse(localStorage.getItem('rh_produtos') || '[]');
+
+function renderLista() {
+  const el = document.getElementById('lista');
+  if (!produtos.length) { el.innerHTML = '<div class="empty">Nenhum produto ainda. Adicione o primeiro!</div>'; return; }
+  el.innerHTML = produtos.map((p, i) => `
+    <div class="produto-item">
+      <div class="produto-item-info">
+        <div class="produto-item-nome">${p.nome}</div>
+        <div class="produto-item-cat">${p.categoria}</div>
+      </div>
+      <div class="produto-item-acoes">
+        <button class="btn btn-home btn-sm" onclick="editarProduto(${i})">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="removerProduto(${i})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function salvarProduto() {
+  const nome = document.getElementById('nome').value.trim();
+  if (!nome) { alert('Preencha o nome do produto.'); return; }
+  const prod = {
+    nome,
+    categoria: document.getElementById('categoria').value,
+    descricao: document.getElementById('descricao').value.trim(),
+    link_shopee: document.getElementById('link_shopee').value.trim(),
+    link_ml: document.getElementById('link_ml').value.trim(),
+    link_amazon: document.getElementById('link_amazon').value.trim(),
+  };
+  const idx = parseInt(document.getElementById('edit-index').value);
+  if (idx >= 0) { produtos[idx] = prod; } else { produtos.push(prod); }
+  localStorage.setItem('rh_produtos', JSON.stringify(produtos));
+  limparForm(); renderLista(); mostrarToast('✅ Produto salvo!');
+}
+
+function editarProduto(i) {
+  const p = produtos[i];
+  document.getElementById('edit-index').value = i;
+  document.getElementById('nome').value = p.nome;
+  document.getElementById('categoria').value = p.categoria;
+  document.getElementById('descricao').value = p.descricao;
+  document.getElementById('link_shopee').value = p.link_shopee || '';
+  document.getElementById('link_ml').value = p.link_ml || '';
+  document.getElementById('link_amazon').value = p.link_amazon || '';
+  document.getElementById('btn-cancelar').style.display = 'inline-flex';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function removerProduto(i) {
+  if (!confirm('Remover este produto?')) return;
+  produtos.splice(i, 1);
+  localStorage.setItem('rh_produtos', JSON.stringify(produtos));
+  renderLista(); mostrarToast('🗑️ Produto removido.');
+}
+
+function limparForm() {
+  document.getElementById('edit-index').value = -1;
+  ['nome','descricao','link_shopee','link_ml','link_amazon'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('categoria').value = 'Monitor';
+  document.getElementById('btn-cancelar').style.display = 'none';
+}
+
+function exportarJSON() {
+  const blob = new Blob([JSON.stringify(produtos, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'index.json'; a.click();
+  mostrarToast('📥 Arquivo baixado! Suba no GitHub em _produtos/index.json');
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+renderLista();
+</script>
+</body>
+</html>
