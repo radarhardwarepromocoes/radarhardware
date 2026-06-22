@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Hardware</title>
+<script src="https://unpkg.com/marked/marked.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --neon: #00d4ff; --neon2: #7b2fff;
+    --bg: #050a12; --bg2: #0a1120; --card: #0d1a2e;
+    --border: rgba(0,212,255,0.2); --text: #e0eaf8; --muted: #6b8aad;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .hero { position: relative; z-index: 1; text-align: center; padding: 80px 24px 60px; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 70%); }
+  .logo-wrap { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .radar-icon { width: 56px; height: 56px; flex-shrink: 0; }
+  .radar-icon svg { width: 100%; height: 100%; }
+  .logo-text { font-family: 'Orbitron', monospace; font-size: clamp(28px,6vw,48px); font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #00d4ff 0%, #7b2fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-tag { display: inline-block; font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 4px; color: var(--neon); border: 1px solid var(--border); padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(18px,3vw,26px); font-weight: 300; max-width: 560px; margin: 0 auto 12px; line-height: 1.5; }
+  .hero h1 span { color: var(--neon); font-weight: 600; }
+  .hero p { color: var(--muted); font-size: 14px; max-width: 420px; margin: 0 auto; }
+  .pulse-line { width: 120px; height: 2px; background: linear-gradient(90deg,transparent,var(--neon),transparent); margin: 32px auto 0; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+  .section { position: relative; z-index: 1; padding: 60px 24px; max-width: 1100px; margin: 0 auto; }
+  .section-title { font-family: 'Orbitron', monospace; font-size: 13px; letter-spacing: 4px; color: var(--neon); text-transform: uppercase; margin-bottom: 8px; }
+  .section-sub { font-size: clamp(20px,3vw,28px); font-weight: 600; margin-bottom: 40px; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: transform .25s, box-shadow .25s, border-color .25s; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,var(--neon),var(--neon2)); opacity: 0; transition: opacity .25s; }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 0 30px rgba(0,212,255,0.15); border-color: rgba(0,212,255,0.5); }
+  .card:hover::before { opacity: 1; }
+  .card-badge { display: inline-block; font-size: 10px; font-family: 'Orbitron', monospace; letter-spacing: 2px; padding: 3px 10px; border-radius: 20px; margin-bottom: 16px; text-transform: uppercase; background: rgba(0,212,255,0.1); color: var(--neon); border: 1px solid rgba(0,212,255,0.3); }
+  .card-emoji { font-size: 36px; margin-bottom: 12px; display: block; }
+  .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .card-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn-platform { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; transition: filter .2s, transform .15s; }
+  .btn-platform:hover { filter: brightness(1.2); transform: scale(1.04); }
+  .btn-shopee { background: #f63; color: #fff; }
+  .btn-ml { background: #ffe600; color: #333; }
+  .btn-amazon { background: #ff9900; color: #111; }
+  .platforms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 20px; }
+  .platform-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; text-decoration: none; display: block; transition: transform .25s, box-shadow .25s, border-color .25s; }
+  .platform-card:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.45); }
+  .platform-icon { font-size: 40px; margin-bottom: 14px; display: block; }
+  .platform-name { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .platform-desc { font-size: 12px; color: var(--muted); }
+  .platform-arrow { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 12px; color: var(--neon); font-weight: 600; }
+  .twitter-banner { position: relative; z-index: 1; margin: 0 24px 60px; max-width: 1052px; margin-left: auto; margin-right: auto; background: linear-gradient(135deg,rgba(0,212,255,0.08),rgba(123,47,255,0.08)); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; text-align: center; }
+  .twitter-banner h2 { font-size: clamp(18px,3vw,24px); font-weight: 600; margin-bottom: 10px; }
+  .twitter-banner p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .btn-twitter { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg,var(--neon),var(--neon2)); color: #fff; font-weight: 700; font-size: 15px; padding: 14px 32px; border-radius: 12px; text-decoration: none; transition: filter .2s, transform .15s; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
+  .btn-twitter:hover { filter: brightness(1.15); transform: scale(1.03); }
+  footer { position: relative; z-index: 1; text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; line-height: 2; }
+  footer a { color: var(--neon); text-decoration: none; }
+  #produtos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 20px; }
+  .loading { color: var(--muted); font-size: 14px; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-tag">⚡ Ofertas Selecionadas</div>
+  <div class="logo-wrap">
+    <div class="radar-icon">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="26" stroke="#00d4ff" stroke-width="1.5" opacity="0.3"/>
+        <circle cx="28" cy="28" r="18" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="28" cy="28" r="10" stroke="#00d4ff" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="28" cy="28" r="3" fill="#00d4ff"/>
+        <line x1="28" y1="28" x2="28" y2="2" stroke="#00d4ff" stroke-width="1.5" opacity="0.4"/>
+        <line x1="28" y1="28" x2="50" y2="28" stroke="#00d4ff" stroke-width="1.5" opacity="0.4"/>
+        <line x1="28" y1="28" x2="44" y2="12" stroke="#7b2fff" stroke-width="2" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 28 28" to="360 28 28" dur="3s" repeatCount="indefinite"/>
+        </line>
+      </svg>
+    </div>
+    <div class="logo-text">RADAR HARDWARE</div>
+  </div>
+  <h1>As melhores ofertas em <span>hardware e tecnologia</span> — rastreadas para você</h1>
+  <p>Curadoria de produtos tech com os melhores preços nas maiores plataformas do Brasil.</p>
+  <div class="pulse-line"></div>
+</section>
+
+<section class="section">
+  <div class="section-title">// produtos em destaque</div>
+  <div class="section-sub">Seleção da semana</div>
+  <div id="produtos-container"><p class="loading">Carregando produtos...</p></div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="section-title">// onde comprar</div>
+  <div class="section-sub">Escolha sua plataforma</div>
+  <div class="platforms-grid">
+    <a class="platform-card" href="https://shopee.com.br" target="_blank">
+      <span class="platform-icon">🛍️</span>
+      <div class="platform-name">Shopee</div>
+      <div class="platform-desc">Fretes grátis e cupons exclusivos todos os dias</div>
+      <div class="platform-arrow">Ver ofertas →</div>
+    </a>
+    <a class="platform-card" href="https://mercadolivre.com.br" target="_blank">
+      <span class="platform-icon">🛒</span>
+      <div class="platform-name">Mercado Livre</div>
+      <div class="platform-desc">Entrega rápida e parcelamento sem juros</div>
+      <div class="platform-arrow">Ver ofertas →</div>
+    </a>
+    <a class="platform-card" href="https://amazon.com.br" target="_blank">
+      <span class="platform-icon">📦</span>
+      <div class="platform-name">Amazon</div>
+      <div class="platform-desc">Prime com entrega expressa e preços competitivos</div>
+      <div class="platform-arrow">Ver ofertas →</div>
+    </a>
+  </div>
+</section>
+
+<div class="twitter-banner">
+  <h2>🔔 Fique por dentro de todas as ofertas</h2>
+  <p>Siga o @radarhardware no Twitter/X para receber drops de promoções, análises e novidades tech em primeira mão.</p>
+  <a class="btn-twitter" href="https://twitter.com/radarhardware" target="_blank">𝕏 &nbsp;Seguir @radarhardware</a>
+</div>
+
+<footer>
+  <div>© 2026 <strong>Radar Hardware</strong> · Curadoria de produtos tech</div>
+  <div style="margin-top:6px">
+    <a href="https://twitter.com/radarhardware" target="_blank">@radarhardware</a> &nbsp;·&nbsp;
+    Este site contém <strong>links de afiliados</strong>. Ao comprar pelos links, você apoia o canal sem pagar nada a mais. 💙
+  </div>
+</footer>
+
+<script>
+const emojis = { monitor: '🖥️', notebook: '💻', 'pc gamer': '🖱️', periférico: '🖱️', componente: '⚙️', outro: '📦' };
+
+async function carregarProdutos() {
+  const container = document.getElementById('produtos-container');
+  try {
+    const res = await fetch('/_produtos/index.json');
+    if (!res.ok) throw new Error();
+    const lista = await res.json();
+    if (!lista.length) { container.innerHTML = '<p class="loading">Nenhum produto cadastrado ainda.</p>'; return; }
+    container.innerHTML = lista.map(p => `
+      <div class="card">
+        <span class="card-badge">${p.categoria || 'produto'}</span>
+        <span class="card-emoji">${emojis[p.categoria?.toLowerCase()] || '📦'}</span>
+        <h3>${p.nome}</h3>
+        <p>${p.descricao}</p>
+        <div class="card-links">
+          ${p.link_shopee ? `<a class="btn-platform btn-shopee" href="${p.link_shopee}" target="_blank">🛍️ Shopee</a>` : ''}
+          ${p.link_ml ? `<a class="btn-platform btn-ml" href="${p.link_ml}" target="_blank">🛒 Mercado Livre</a>` : ''}
+          ${p.link_amazon ? `<a class="btn-platform btn-amazon" href="${p.link_amazon}" target="_blank">📦 Amazon</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch {
+    // fallback: produtos estáticos
+    container.innerHTML = `
+      <div class="card"><span class="card-badge">Monitor</span><span class="card-emoji">🖥️</span><h3>LG UltraGear 34G600A-B</h3><p>Monitor ultrawide 34" curvo, 144Hz, 1ms, IPS.</p><div class="card-links"><a class="btn-platform btn-shopee" href="https://shopee.com.br" target="_blank">🛍️ Shopee</a><a class="btn-platform btn-ml" href="https://mercadolivre.com.br" target="_blank">🛒 Mercado Livre</a><a class="btn-platform btn-amazon" href="https://amazon.com.br" target="_blank">📦 Amazon</a></div></div>
+      <div class="card"><span class="card-badge">Notebook</span><span class="card-emoji">💻</span><h3>Dell Inspiron 15 3530</h3><p>Intel Core i5 13ª geração, 16GB RAM, SSD 512GB.</p><div class="card-links"><a class="btn-platform btn-shopee" href="https://shopee.com.br" target="_blank">🛍️ Shopee</a><a class="btn-platform btn-ml" href="https://mercadolivre.com.br" target="_blank">🛒 Mercado Livre</a><a class="btn-platform btn-amazon" href="https://amazon.com.br" target="_blank">📦 Amazon</a></div></div>
+      <div class="card"><span class="card-badge">PC Gamer</span><span class="card-emoji">🖱️</span><h3>BluePC FRAG PC Gamer</h3><p>PC Gamer completo com placa de vídeo dedicada e RGB.</p><div class="card-links"><a class="btn-platform btn-shopee" href="https://shopee.com.br" target="_blank">🛍️ Shopee</a><a class="btn-platform btn-ml" href="https://mercadolivre.com.br" target="_blank">🛒 Mercado Livre</a><a class="btn-platform btn-amazon" href="https://amazon.com.br" target="_blank">📦 Amazon</a></div></div>
+    `;
+  }
+}
+carregarProdutos();
+</script>
+</body>
+</html>
