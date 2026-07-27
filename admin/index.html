@@ -19,6 +19,7 @@
   input, textarea, select { width: 100%; background: #060e1a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 18px; outline: none; transition: border-color .2s; }
   input:focus, textarea:focus, select:focus { border-color: var(--neon); }
   textarea { min-height: 80px; resize: vertical; }
+  textarea#p-body { min-height: 200px; font-family: ui-monospace, monospace; font-size: 13px; }
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: filter .2s, transform .15s; }
   .btn:hover { filter: brightness(1.15); transform: scale(1.02); }
   .btn-primary { background: linear-gradient(135deg,var(--neon),var(--neon2)); color: #fff; }
@@ -27,13 +28,24 @@
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--neon); border-radius: 12px; padding: 14px 20px; font-size: 13px; color: var(--neon); z-index: 999; display: none; }
   .lista-produtos { margin-top: 0; }
   .produto-item { background: #060e1a; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .produto-item-info { flex: 1; }
-  .produto-item-nome { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .produto-item-info { flex: 1; min-width: 0; }
+  .produto-item-nome { font-size: 14px; font-weight: 600; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .produto-item-cat { font-size: 11px; color: var(--neon); text-transform: uppercase; letter-spacing: 1px; }
   .produto-item-acoes { display: flex; gap: 8px; }
   .btn-sm { padding: 6px 12px; font-size: 12px; }
   .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 20px 0; }
   .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .hint { font-size: 11px; color: var(--muted); margin: -12px 0 18px; line-height: 1.6; }
+  .hint code { color: var(--neon); }
+  /* tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab-btn { padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card); border: 1px solid var(--border); color: var(--muted); font-family: 'Inter', sans-serif; transition: filter .2s, color .2s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { background: linear-gradient(135deg,var(--neon),var(--neon2)); color: #fff; border-color: transparent; }
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 520px){ .row2 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -41,57 +53,155 @@
   <div class="nav">
     <div>
       <h1>⚙️ ADMIN</h1>
-      <div class="subtitle">Gerencie os produtos do Radar Hardware</div>
+      <div class="subtitle">Gerencie os produtos e posts do Radar Hardware</div>
     </div>
     <a class="btn btn-home" href="/">← Ver site</a>
   </div>
 
-  <div class="card">
-    <h2>➕ Adicionar / Editar Produto</h2>
-    <input type="hidden" id="edit-index" value="-1">
-    <label>Nome do produto</label>
-    <input type="text" id="nome" placeholder="Ex: LG UltraGear 34G600A-B">
-    <label>Categoria</label>
-    <select id="categoria">
-      <option value="Monitor">Monitor</option>
-      <option value="Notebook">Notebook</option>
-      <option value="PC Gamer">PC Gamer</option>
-      <option value="Componente">Componente</option>
-      <option value="Periférico">Periférico</option>
-      <option value="Outro">Outro</option>
-    </select>
-    <label>Descrição curta</label>
-    <textarea id="descricao" placeholder="Ex: Monitor ultrawide 34&quot; curvo, 144Hz, 1ms, IPS."></textarea>
-    <label>Link Shopee (afiliado)</label>
-    <input type="url" id="link_shopee" placeholder="https://s.shopee.com.br/...">
-    <label>Link Mercado Livre (afiliado)</label>
-    <input type="url" id="link_ml" placeholder="https://mercadolivre.com/...">
-    <label>Link Amazon (afiliado)</label>
-    <input type="url" id="link_amazon" placeholder="https://amzn.to/...">
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn btn-primary" onclick="salvarProduto()">💾 Salvar Produto</button>
-      <button class="btn btn-danger btn-sm" onclick="limparForm()" style="display:none" id="btn-cancelar">✕ Cancelar</button>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="produtos" onclick="switchTab('produtos')">📦 Produtos</button>
+    <button class="tab-btn" data-tab="blog" onclick="switchTab('blog')">📝 Blog</button>
+  </div>
+
+  <!-- ============ PRODUTOS ============ -->
+  <div class="tab-section active" id="tab-produtos">
+    <div class="card">
+      <h2>➕ Adicionar / Editar Produto</h2>
+      <input type="hidden" id="edit-index" value="-1">
+      <label>Nome do produto</label>
+      <input type="text" id="nome" placeholder="Ex: LG UltraGear 34G600A-B">
+      <label>Categoria</label>
+      <select id="categoria">
+        <option value="Monitor">Monitor</option>
+        <option value="Notebook">Notebook</option>
+        <option value="PC Gamer">PC Gamer</option>
+        <option value="Componente">Componente</option>
+        <option value="Periférico">Periférico</option>
+        <option value="Outro">Outro</option>
+      </select>
+      <label>Descrição curta</label>
+      <textarea id="descricao" placeholder="Ex: Monitor ultrawide 34&quot; curvo, 144Hz, 1ms, IPS."></textarea>
+      <label>Link Shopee (afiliado)</label>
+      <input type="url" id="link_shopee" placeholder="https://s.shopee.com.br/...">
+      <label>Link Mercado Livre (afiliado)</label>
+      <input type="url" id="link_ml" placeholder="https://mercadolivre.com/...">
+      <label>Link Amazon (afiliado)</label>
+      <input type="url" id="link_amazon" placeholder="https://amzn.to/...">
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-primary" onclick="salvarProduto()">💾 Salvar Produto</button>
+        <button class="btn btn-danger btn-sm" onclick="limparForm()" style="display:none" id="btn-cancelar">✕ Cancelar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📦 Produtos Cadastrados</h2>
+      <div class="lista-produtos" id="lista"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:8px">
+      <button class="btn btn-primary" onclick="exportarJSON()" style="font-size:13px">📥 Exportar produtos.json</button>
+      <p style="color:var(--muted);font-size:11px;margin-top:10px">Após exportar, faça upload do arquivo no GitHub em <code style="color:var(--neon)">_produtos/index.json</code></p>
     </div>
   </div>
 
-  <div class="card">
-    <h2>📦 Produtos Cadastrados</h2>
-    <div class="lista-produtos" id="lista"></div>
-  </div>
+  <!-- ============ BLOG ============ -->
+  <div class="tab-section" id="tab-blog">
+    <div class="card">
+      <h2>➕ Adicionar / Editar Post</h2>
+      <input type="hidden" id="p-edit-index" value="-1">
+      <label>Título do review</label>
+      <input type="text" id="p-title" placeholder="Ex: Ryzen 5 5600 ainda vale a pena em 2026?">
+      <div class="row2">
+        <div>
+          <label>Categoria</label>
+          <select id="p-category">
+            <option>Processador</option>
+            <option>Placa de vídeo</option>
+            <option>Placa-mãe</option>
+            <option>Memória RAM</option>
+            <option>Armazenamento</option>
+            <option>Gabinete</option>
+            <option>Fonte</option>
+            <option>Cooler</option>
+            <option>Monitor</option>
+            <option>Periférico</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div>
+          <label>Data</label>
+          <input type="date" id="p-date">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Rótulo da capa (opcional)</label>
+          <input type="text" id="p-code" placeholder="Ex: AM4 · 6C/12T">
+        </div>
+        <div>
+          <label>URL da imagem de capa (opcional)</label>
+          <input type="url" id="p-cover" placeholder="https://...">
+        </div>
+      </div>
+      <label>Resumo (aparece no card)</label>
+      <textarea id="p-excerpt" placeholder="Uma ou duas frases que resumem o review."></textarea>
+      <label>Texto do review</label>
+      <textarea id="p-body" placeholder="Escreva aqui...
 
-  <div style="text-align:center;margin-top:8px">
-    <button class="btn btn-primary" onclick="exportarJSON()" style="font-size:13px">📥 Exportar produtos.json</button>
-    <p style="color:var(--muted);font-size:11px;margin-top:10px">Após exportar, faça upload do arquivo no GitHub em <code style="color:var(--neon)">_produtos/index.json</code></p>
+## Um subtítulo
+
+Um parágrafo com **negrito**.
+
+- item de lista
+- outro item
+
+> uma citação em destaque"></textarea>
+      <p class="hint">Aceita Markdown: <code>## título</code>, <code>**negrito**</code>, <code>- listas</code>, <code>&gt; citação</code> e tabelas com <code>| col | col |</code>. Deixe uma linha em branco entre parágrafos.</p>
+      <label>Link Shopee (afiliado)</label>
+      <input type="url" id="p-shopee" placeholder="https://s.shopee.com.br/...">
+      <label>Link Mercado Livre (afiliado)</label>
+      <input type="url" id="p-ml" placeholder="https://mercadolivre.com/...">
+      <label>Link Amazon (afiliado)</label>
+      <input type="url" id="p-amazon" placeholder="https://amzn.to/...">
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-primary" onclick="salvarPost()">💾 Salvar Post</button>
+        <button class="btn btn-danger btn-sm" onclick="limparFormPost()" style="display:none" id="p-btn-cancelar">✕ Cancelar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Posts Publicados</h2>
+      <div class="lista-produtos" id="p-lista"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:8px">
+      <button class="btn btn-primary" onclick="exportarPostsJSON()" style="font-size:13px">📥 Exportar posts.json</button>
+      <p style="color:var(--muted);font-size:11px;margin-top:10px">Após exportar, faça upload do arquivo no GitHub em <code style="color:var(--neon)">_posts/index.json</code></p>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast">✅ Salvo com sucesso!</div>
 
 <script>
+const $ = id => document.getElementById(id);
+
+/* ---------- tabs ---------- */
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('active', s.id === 'tab-' + name));
+}
+
+function mostrarToast(msg) {
+  const t = $('toast'); t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+/* ================= PRODUTOS ================= */
 let produtos = JSON.parse(localStorage.getItem('rh_produtos') || '[]');
 
 function renderLista() {
-  const el = document.getElementById('lista');
+  const el = $('lista');
   if (!produtos.length) { el.innerHTML = '<div class="empty">Nenhum produto ainda. Adicione o primeiro!</div>'; return; }
   el.innerHTML = produtos.map((p, i) => `
     <div class="produto-item">
@@ -108,17 +218,17 @@ function renderLista() {
 }
 
 function salvarProduto() {
-  const nome = document.getElementById('nome').value.trim();
+  const nome = $('nome').value.trim();
   if (!nome) { alert('Preencha o nome do produto.'); return; }
   const prod = {
     nome,
-    categoria: document.getElementById('categoria').value,
-    descricao: document.getElementById('descricao').value.trim(),
-    link_shopee: document.getElementById('link_shopee').value.trim(),
-    link_ml: document.getElementById('link_ml').value.trim(),
-    link_amazon: document.getElementById('link_amazon').value.trim(),
+    categoria: $('categoria').value,
+    descricao: $('descricao').value.trim(),
+    link_shopee: $('link_shopee').value.trim(),
+    link_ml: $('link_ml').value.trim(),
+    link_amazon: $('link_amazon').value.trim(),
   };
-  const idx = parseInt(document.getElementById('edit-index').value);
+  const idx = parseInt($('edit-index').value);
   if (idx >= 0) { produtos[idx] = prod; } else { produtos.push(prod); }
   localStorage.setItem('rh_produtos', JSON.stringify(produtos));
   limparForm(); renderLista(); mostrarToast('✅ Produto salvo!');
@@ -126,14 +236,14 @@ function salvarProduto() {
 
 function editarProduto(i) {
   const p = produtos[i];
-  document.getElementById('edit-index').value = i;
-  document.getElementById('nome').value = p.nome;
-  document.getElementById('categoria').value = p.categoria;
-  document.getElementById('descricao').value = p.descricao;
-  document.getElementById('link_shopee').value = p.link_shopee || '';
-  document.getElementById('link_ml').value = p.link_ml || '';
-  document.getElementById('link_amazon').value = p.link_amazon || '';
-  document.getElementById('btn-cancelar').style.display = 'inline-flex';
+  $('edit-index').value = i;
+  $('nome').value = p.nome;
+  $('categoria').value = p.categoria;
+  $('descricao').value = p.descricao;
+  $('link_shopee').value = p.link_shopee || '';
+  $('link_ml').value = p.link_ml || '';
+  $('link_amazon').value = p.link_amazon || '';
+  $('btn-cancelar').style.display = 'inline-flex';
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
@@ -145,10 +255,10 @@ function removerProduto(i) {
 }
 
 function limparForm() {
-  document.getElementById('edit-index').value = -1;
-  ['nome','descricao','link_shopee','link_ml','link_amazon'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('categoria').value = 'Monitor';
-  document.getElementById('btn-cancelar').style.display = 'none';
+  $('edit-index').value = -1;
+  ['nome','descricao','link_shopee','link_ml','link_amazon'].forEach(id => $(id).value = '');
+  $('categoria').value = 'Monitor';
+  $('btn-cancelar').style.display = 'none';
 }
 
 function exportarJSON() {
@@ -158,12 +268,108 @@ function exportarJSON() {
   mostrarToast('📥 Arquivo baixado! Suba no GitHub em _produtos/index.json');
 }
 
-function mostrarToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+/* ================= BLOG ================= */
+let posts = JSON.parse(localStorage.getItem('rh_posts') || '[]');
+
+function slugify(t) {
+  return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 70) || 'post-sem-titulo';
 }
 
+function renderListaPosts() {
+  const el = $('p-lista');
+  if (!posts.length) { el.innerHTML = '<div class="empty">Nenhum post ainda. Escreva o primeiro review!</div>'; return; }
+  el.innerHTML = posts.map((p, i) => `
+    <div class="produto-item">
+      <div class="produto-item-info">
+        <div class="produto-item-nome">${p.title}</div>
+        <div class="produto-item-cat">${p.category} · ${p.date}</div>
+      </div>
+      <div class="produto-item-acoes">
+        <button class="btn btn-home btn-sm" onclick="editarPost(${i})">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="removerPost(${i})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function salvarPost() {
+  const title = $('p-title').value.trim();
+  if (!title) { alert('Preencha o título do post.'); return; }
+  const links = [];
+  const s = $('p-shopee').value.trim(); if (s) links.push({ loja: 'Shopee', url: s });
+  const m = $('p-ml').value.trim();     if (m) links.push({ loja: 'Mercado Livre', url: m });
+  const a = $('p-amazon').value.trim(); if (a) links.push({ loja: 'Amazon', url: a });
+  const post = {
+    slug: slugify(title),
+    title,
+    category: $('p-category').value,
+    date: $('p-date').value || new Date().toISOString().slice(0, 10),
+    cover: $('p-cover').value.trim(),
+    code: $('p-code').value.trim(),
+    excerpt: $('p-excerpt').value.trim(),
+    body: $('p-body').value,
+    links
+  };
+  const idx = parseInt($('p-edit-index').value);
+  if (idx >= 0) { posts[idx] = post; } else { posts.unshift(post); }
+  localStorage.setItem('rh_posts', JSON.stringify(posts));
+  limparFormPost(); renderListaPosts(); mostrarToast('✅ Post salvo!');
+}
+
+function editarPost(i) {
+  const p = posts[i];
+  $('p-edit-index').value = i;
+  $('p-title').value = p.title;
+  $('p-category').value = p.category;
+  $('p-date').value = p.date;
+  $('p-code').value = p.code || '';
+  $('p-cover').value = p.cover || '';
+  $('p-excerpt').value = p.excerpt || '';
+  $('p-body').value = p.body || '';
+  const byLoja = n => ((p.links || []).find(l => l.loja === n) || {}).url || '';
+  $('p-shopee').value = byLoja('Shopee');
+  $('p-ml').value = byLoja('Mercado Livre');
+  $('p-amazon').value = byLoja('Amazon');
+  $('p-btn-cancelar').style.display = 'inline-flex';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function removerPost(i) {
+  if (!confirm('Remover este post?')) return;
+  posts.splice(i, 1);
+  localStorage.setItem('rh_posts', JSON.stringify(posts));
+  renderListaPosts(); mostrarToast('🗑️ Post removido.');
+}
+
+function limparFormPost() {
+  $('p-edit-index').value = -1;
+  ['p-title','p-code','p-cover','p-excerpt','p-body','p-shopee','p-ml','p-amazon'].forEach(id => $(id).value = '');
+  $('p-category').value = 'Processador';
+  $('p-date').value = new Date().toISOString().slice(0, 10);
+  $('p-btn-cancelar').style.display = 'none';
+}
+
+function exportarPostsJSON() {
+  const clean = posts.map(x => {
+    const o = { slug: x.slug, title: x.title, category: x.category, date: x.date };
+    if (x.cover) o.cover = x.cover;
+    if (x.code) o.code = x.code;
+    o.excerpt = x.excerpt || '';
+    o.body = x.body || '';
+    o.links = x.links || [];
+    return o;
+  });
+  const blob = new Blob([JSON.stringify(clean, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'index.json'; a.click();
+  mostrarToast('📥 Arquivo baixado! Suba no GitHub em _posts/index.json');
+}
+
+/* ---------- init ---------- */
+$('p-date').value = new Date().toISOString().slice(0, 10);
 renderLista();
+renderListaPosts();
 </script>
 </body>
 </html>
