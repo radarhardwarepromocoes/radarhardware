@@ -19,6 +19,14 @@
     background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
+  .topnav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px; background: rgba(5,10,18,0.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  .tn-brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
+  .tn-brand svg { width: 24px; height: 24px; flex-shrink: 0; }
+  .tn-brand span { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px; letter-spacing: 1px; color: var(--text); }
+  .tn-links { display: flex; gap: 6px; }
+  .tn-links a { font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px; color: var(--muted); text-decoration: none; padding: 8px 14px; border-radius: 8px; border: 1px solid transparent; transition: color .18s, border-color .18s, background .18s; text-transform: uppercase; }
+  .tn-links a:hover { color: var(--text); border-color: var(--border); background: var(--card); }
+  .tn-links a.active { color: var(--neon); border-color: var(--border); }
   .hero { position: relative; z-index: 1; text-align: center; padding: 80px 24px 60px; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 70%); }
   .logo-wrap { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 24px; }
   .radar-icon { width: 56px; height: 56px; flex-shrink: 0; }
@@ -67,6 +75,22 @@
 </style>
 </head>
 <body>
+
+<nav class="topnav">
+  <a class="tn-brand" href="index.html" aria-label="Radar Hardware">
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="26" stroke="#00d4ff" stroke-width="2" opacity="0.35"/>
+      <circle cx="28" cy="28" r="15" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+      <circle cx="28" cy="28" r="4" fill="#00d4ff"/>
+      <line x1="28" y1="28" x2="46" y2="12" stroke="#7b2fff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <span>RADAR HARDWARE</span>
+  </a>
+  <div class="tn-links">
+    <a href="index.html" class="active">Ofertas</a>
+    <a href="blog.html">Blog</a>
+  </div>
+</nav>
 
 <section class="hero">
   <div class="hero-tag">⚡ Ofertas Selecionadas</div>
